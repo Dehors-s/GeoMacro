@@ -1,0 +1,58 @@
+<ArcGIS xmlns="http://schemas.esri.com/DADF/Registry"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://schemas.esri.com/DADF/Registry file:///C:/ArcGIS/Pro/bin/ArcGIS.Desktop.Framework.xsd"
+        defaultAssembly="GeoMacroAddin.dll"
+        defaultNamespace="GeoMacroAddin">
+  <AddInInfo id="{3E1E5BE5-6E0C-4B50-8E6E-5D5D4E3B7A90}"
+             version="0.1.4"
+             desktopVersion="3.0.0">
+    <Name>GeoMacro Add-in</Name>
+    <Description>Capture geoprocessing execution events for GeoMacro MVP.</Description>
+    <Author>GeoMacro Team</Author>
+    <Company>GeoMacro</Company>
+    <Date>2026-04-20</Date>
+    <Subject>Monitoring</Subject>
+  </AddInInfo>
+  <modules>
+    <insertModule id="GeoMacroAddin_Module"
+                  className="GeoMacroAddinModule"
+                  autoLoad="true"
+                  caption="GeoMacro Add-in">
+      <tabs>
+        <tab id="GeoMacroAddin_Tab"
+             caption="GeoMacro"
+             keytip="G">
+          <group refID="GeoMacroAddin_Group" />
+        </tab>
+      </tabs>
+      <groups>
+        <group id="GeoMacroAddin_Group"
+               caption="Monitoring"
+               keytip="M">
+          <button refID="GeoMacroAddin_ShowEventLogDockpane" size="large" />
+          <button refID="GeoMacroAddin_ToggleCapture" size="large" />
+        </group>
+      </groups>
+      <controls>
+        <button id="GeoMacroAddin_ShowEventLogDockpane"
+                caption="Open Event Log"
+                className="Commands.ShowEventLogDockpaneButton"
+                keytip="L"
+                loadOnClick="true" />
+        <button id="GeoMacroAddin_ToggleCapture"
+                caption="Toggle Capture"
+                className="Commands.ToggleCaptureButton"
+                keytip="T"
+                loadOnClick="true" />
+      </controls>
+      <dockPanes>
+        <dockPane id="GeoMacroAddin_EventLogDockpane"
+                  caption="GeoMacro Event Log"
+                  className="Dockpane.EventLogDockpaneViewModel"
+                  dock="group">
+          <content className="Dockpane.EventLogDockpaneView" />
+        </dockPane>
+      </dockPanes>
+    </insertModule>
+  </modules>
+</ArcGIS>

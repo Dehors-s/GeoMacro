@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <OutputType>Library</OutputType>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AssemblyName>GeoMacroAddin</AssemblyName>
+    <RootNamespace>GeoMacroAddin</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <PackageType>Addin</PackageType>
+
+    <ArcGISProInstallDir Condition="'$(ArcGISProInstallDir)' == ''">$([MSBuild]::GetRegistryValueFromView('HKEY_LOCAL_MACHINE\SOFTWARE\ESRI\ArcGISPro', 'InstallDir', null, RegistryView.Registry64))</ArcGISProInstallDir>
+    <ArcGISProInstallDir Condition="'$(ArcGISProInstallDir)' == ''">$(registry:HKEY_CURRENT_USER\SOFTWARE\ESRI\ArcGISPro@InstallDir)</ArcGISProInstallDir>
+    <ArcGISProInstallDir Condition="'$(ArcGISProInstallDir)' == ''">D:\ArcGIS Pro 3.0</ArcGISProInstallDir>
+    <ArcGISBinDir>$([System.IO.Path]::Combine('$(ArcGISProInstallDir)', 'bin'))</ArcGISBinDir>
+    <ArcGISDesktopCoreDir>$([System.IO.Path]::Combine('$(ArcGISBinDir)', 'Extensions', 'Core'))</ArcGISDesktopCoreDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="ArcGIS.Desktop.Framework">
+      <HintPath>$(ArcGISBinDir)\ArcGIS.Desktop.Framework.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ArcGIS.Desktop.Core">
+      <HintPath>$(ArcGISDesktopCoreDir)\ArcGIS.Desktop.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="ArcGIS.Core">
+      <HintPath>$(ArcGISBinDir)\ArcGIS.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Config.daml">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Target Name="ValidateArcGISReferences" BeforeTargets="Build">
+    <Message Importance="High" Text="ArcGISProInstallDir=$(ArcGISProInstallDir)" />
+    <Message Importance="High" Text="ArcGISBinDir=$(ArcGISBinDir)" />
+    <Message Importance="High" Text="ArcGISDesktopCoreDir=$(ArcGISDesktopCoreDir)" />
+    <Error Condition="!Exists('$(ArcGISBinDir)\ArcGIS.Desktop.Framework.dll')"
+           Text="ArcGIS.Desktop.Framework.dll not found under $(ArcGISBinDir). Pass -p:ArcGISProInstallDir=&lt;ArcGIS Pro path&gt;." />
+    <Error Condition="!Exists('$(ArcGISDesktopCoreDir)\ArcGIS.Desktop.Core.dll')"
+           Text="ArcGIS.Desktop.Core.dll not found under $(ArcGISDesktopCoreDir). Check your ArcGIS Pro installation path." />
+    <Error Condition="!Exists('$(ArcGISBinDir)\ArcGIS.Core.dll')"
+           Text="ArcGIS.Core.dll not found under $(ArcGISBinDir). Check your ArcGIS Pro installation path." />
+  </Target>
+
+    <Import Project="$(ArcGISBinDir)\Esri.ProApp.SDK.Desktop.targets"
+      Condition="'$(DisableArcGISPackaging)' != 'true' and Exists('$(ArcGISBinDir)\Esri.ProApp.SDK.Desktop.targets')" />
+</Project>

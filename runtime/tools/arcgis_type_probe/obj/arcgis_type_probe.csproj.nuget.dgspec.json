@@ -1,0 +1,58 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\Work space\\GEO\\GeoMacro\\runtime\\tools\\arcgis_type_probe\\arcgis_type_probe.csproj": {}
+  },
+  "projects": {
+    "D:\\Work space\\GEO\\GeoMacro\\runtime\\tools\\arcgis_type_probe\\arcgis_type_probe.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Work space\\GEO\\GeoMacro\\runtime\\tools\\arcgis_type_probe\\arcgis_type_probe.csproj",
+        "projectName": "arcgis_type_probe",
+        "projectPath": "D:\\Work space\\GEO\\GeoMacro\\runtime\\tools\\arcgis_type_probe\\arcgis_type_probe.csproj",
+        "packagesPath": "C:\\Users\\21920\\.nuget\\packages\\",
+        "outputPath": "D:\\Work space\\GEO\\GeoMacro\\runtime\\tools\\arcgis_type_probe\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\21920\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0"
+        ],
+        "frameworks": {
+          "net6.0": {
+            "targetAlias": "net6.0",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.428\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

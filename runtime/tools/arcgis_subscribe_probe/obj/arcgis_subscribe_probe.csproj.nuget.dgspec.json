@@ -1,0 +1,61 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\Work space\\GEO\\GeoMacro\\runtime\\tools\\arcgis_subscribe_probe\\arcgis_subscribe_probe.csproj": {}
+  },
+  "projects": {
+    "D:\\Work space\\GEO\\GeoMacro\\runtime\\tools\\arcgis_subscribe_probe\\arcgis_subscribe_probe.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Work space\\GEO\\GeoMacro\\runtime\\tools\\arcgis_subscribe_probe\\arcgis_subscribe_probe.csproj",
+        "projectName": "arcgis_subscribe_probe",
+        "projectPath": "D:\\Work space\\GEO\\GeoMacro\\runtime\\tools\\arcgis_subscribe_probe\\arcgis_subscribe_probe.csproj",
+        "packagesPath": "C:\\Users\\21920\\.nuget\\packages\\",
+        "outputPath": "D:\\Work space\\GEO\\GeoMacro\\runtime\\tools\\arcgis_subscribe_probe\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\21920\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "net6.0-windows"
+        ],
+        "frameworks": {
+          "net6.0-windows7.0": {
+            "targetAlias": "net6.0-windows",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net6.0-windows7.0": {
+          "targetAlias": "net6.0-windows",
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WPF": {
+              "privateAssets": "none"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.428\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
