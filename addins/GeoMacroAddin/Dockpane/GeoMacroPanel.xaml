@@ -12,37 +12,43 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <!-- ======== Title ======== -->
-        <TextBlock Grid.Row="0"
-                   Text="GeoMacro Pipeline"
-                   FontSize="15"
-                   FontWeight="Bold"
-                   Margin="0,0,0,6" />
+        <!-- Title -->
+        <TextBlock Grid.Row="0" Text="GeoMacro Pipeline"
+                   FontSize="15" FontWeight="Bold" Margin="0,0,0,4" />
 
-        <!-- ======== Toolbar ======== -->
+        <!-- Toolbar -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,4">
-            <Button Content="⟳ Refresh" Command="{Binding RefreshHistoryCommand}"
+            <Button Content="Refresh" Command="{Binding RefreshHistoryCommand}"
                     Padding="8,2" Margin="0,0,4,0" />
             <Button Content="All" Command="{Binding SelectAllCommand}"
                     Padding="6,2" Margin="0,0,4,0" />
             <Button Content="None" Command="{Binding DeselectAllCommand}"
                     Padding="6,2" Margin="0,0,8,0" />
-            <Button Content="⚡ Generate" Command="{Binding GenerateScriptCommand}"
-                    Padding="10,2" FontWeight="SemiBold"
-                    IsEnabled="{Binding IsGenerating, Converter={x:Null}}" />
+            <Border Background="#CCC" Width="1" Height="18" Margin="0,0,4,0" />
+            <Button Content="Pro" Command="{Binding FilterProCommand}"
+                    Padding="6,2" Margin="0,0,4,0" />
+            <Button Content="D10.8" Command="{Binding FilterDesktopCommand}"
+                    Padding="6,2" Margin="0,0,4,0" />
+            <Button Content="All" Command="{Binding FilterAllCommand}"
+                    Padding="6,2" Margin="0,0,8,0" />
+            <Border Background="#CCC" Width="1" Height="18" Margin="0,0,4,0" />
+            <Button Content="Generate" Command="{Binding GenerateScriptCommand}"
+                    Padding="10,2" FontWeight="SemiBold" />
         </StackPanel>
 
-        <!-- ======== Event List ======== -->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,0,4">
+        <!-- Event List -->
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" Margin="0,0,0,2">
             <ItemsControl ItemsSource="{Binding Events}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="0,1">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="8" />
+                                <ColumnDefinition Width="6" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
@@ -53,28 +59,19 @@
                                       VerticalAlignment="Center" />
 
                             <Border Grid.Column="2"
-                                    Background="SteelBlue"
-                                    CornerRadius="3"
-                                    Padding="4,1">
-                                <TextBlock Text="{Binding Badge}"
-                                           FontSize="10"
-                                           Foreground="White" />
+                                    Background="#4A6FA5"
+                                    CornerRadius="3" Padding="4,1">
+                                <TextBlock Text="{Binding Badge}" FontSize="10" Foreground="White" />
                             </Border>
 
-                            <TextBlock Grid.Column="3"
-                                       Text="{Binding SuccessIcon}"
-                                       FontSize="12"
-                                       Margin="4,0"
-                                       VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="3" Text="{Binding SuccessIcon}"
+                                       FontSize="12" Margin="4,0" VerticalAlignment="Center" />
 
                             <StackPanel Grid.Column="4" Orientation="Vertical">
-                                <TextBlock Text="{Binding DisplayName}"
-                                           FontWeight="SemiBold"
+                                <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold"
                                            TextTrimming="CharacterEllipsis" />
-                                <TextBlock Text="{Binding ToolPath}"
-                                           FontSize="10"
-                                           Foreground="Gray"
-                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock Text="{Binding ToolPath}" FontSize="10"
+                                           Foreground="Gray" TextTrimming="CharacterEllipsis" />
                             </StackPanel>
                         </Grid>
                     </DataTemplate>
@@ -82,38 +79,45 @@
             </ItemsControl>
         </ScrollViewer>
 
-        <!-- ======== Script Preview ======== -->
-        <Border Grid.Row="2" BorderBrush="LightGray" BorderThickness="1"
-                Margin="0,130,0,0" CornerRadius="3" Padding="4">
-            <TextBox Text="{Binding ScriptPreview, Mode=OneWay}"
-                     IsReadOnly="True"
-                     FontFamily="Consolas"
-                     FontSize="11"
-                     VerticalScrollBarVisibility="Auto"
-                     HorizontalScrollBarVisibility="Auto"
-                     Background="#F5F5F5"
-                     TextWrapping="NoWrap" />
+        <!-- Splitter -->
+        <GridSplitter Grid.Row="3" Height="4" HorizontalAlignment="Stretch"
+                      Background="LightGray" Margin="0,2" />
+
+        <!-- Script Preview -->
+        <Border Grid.Row="4" BorderBrush="#D0D0D0" BorderThickness="1" CornerRadius="3" Padding="4">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Script Preview" FontSize="11"
+                           FontWeight="SemiBold" Margin="0,0,0,2" />
+                <TextBox Grid.Row="1"
+                         Text="{Binding ScriptPreview, Mode=OneWay}"
+                         IsReadOnly="True"
+                         FontFamily="Consolas" FontSize="11"
+                         VerticalScrollBarVisibility="Auto"
+                         HorizontalScrollBarVisibility="Auto"
+                         Background="#FAFAFA"
+                         TextWrapping="NoWrap" />
+            </Grid>
         </Border>
 
-        <!-- ======== Bottom Bar ======== -->
-        <Grid Grid.Row="3" Margin="0,4,0,0">
+        <!-- Bottom Bar -->
+        <Grid Grid.Row="5" Margin="0,4,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="0"
-                       Text="{Binding StatusText}"
-                       FontSize="11"
-                       Foreground="DimGray"
+            <TextBlock Grid.Column="0" Text="{Binding StatusText}"
+                       FontSize="11" Foreground="DimGray"
                        VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis" />
 
-            <Button Grid.Column="1"
-                    Content="💾 Save Script"
+            <Button Grid.Column="1" Content="Save Script"
                     Command="{Binding SaveScriptCommand}"
-                    Padding="10,3"
-                    Margin="4,0,0,0" />
+                    Padding="10,3" Margin="4,0,0,0" />
         </Grid>
     </Grid>
 </UserControl>

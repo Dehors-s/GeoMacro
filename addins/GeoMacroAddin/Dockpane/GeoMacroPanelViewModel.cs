@@ -1,11 +1,8 @@
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
-using System.Windows;
 using System.Windows.Input;
 using ArcGIS.Desktop.Framework;
 using ArcGIS.Desktop.Framework.Contracts;
@@ -22,6 +19,8 @@ internal sealed class GeoMacroPanelViewModel : DockPane
     private string _scriptPreview = "";
     private string _statusText = "Ready.";
     private bool _isGenerating;
+    private string _sourceFilter = "arcgis_pro";
+    private ObservableCollection<HistoryEventItem> _allEvents = new();
 
     public GeoMacroPanelViewModel()
     {
@@ -30,11 +29,14 @@ internal sealed class GeoMacroPanelViewModel : DockPane
             projectRoot: @"D:\Work space\GEO\GeoMacro"
         );
 
-        RefreshHistoryCommand = new RelayCommand(_ => RefreshHistory());
-        SelectAllCommand = new RelayCommand(_ => SetAllSelected(true));
-        DeselectAllCommand = new RelayCommand(_ => SetAllSelected(false));
-        GenerateScriptCommand = new RelayCommand(_ => _ = GenerateScriptAsync(), _ => !IsGenerating);
-        SaveScriptCommand = new RelayCommand(_ => SaveScript(), _ => !string.IsNullOrWhiteSpace(ScriptPreview));
+        RefreshHistoryCommand = new RelayCommand(() => RefreshHistory());
+        SelectAllCommand = new RelayCommand(() => SetAllSelected(true));
+        DeselectAllCommand = new RelayCommand(() => SetAllSelected(false));
+        FilterProCommand = new RelayCommand(() => SetSourceFilter("arcgis_pro"));
+        FilterDesktopCommand = new RelayCommand(() => SetSourceFilter("arcgis_desktop"));
+        FilterAllCommand = new RelayCommand(() => SetSourceFilter("all"));
+        GenerateScriptCommand = new RelayCommand(() => { _ = GenerateScriptAsync(); }, () => !IsGenerating);
+        SaveScriptCommand = new RelayCommand(() => SaveScript(), () => !string.IsNullOrWhiteSpace(ScriptPreview));
     }
 
     public ObservableCollection<HistoryEventItem> Events { get; } = new();
@@ -42,13 +44,13 @@ internal sealed class GeoMacroPanelViewModel : DockPane
     public string ScriptPreview
     {
         get => _scriptPreview;
-        set { _scriptPreview = value; OnPropertyChanged(); }
+        set { _scriptPreview = value; NotifyPropertyChanged(); }
     }
 
     public string StatusText
     {
         get => _statusText;
-        set { _statusText = value; OnPropertyChanged(); }
+        set { _statusText = value; NotifyPropertyChanged(); }
     }
 
     public bool IsGenerating
@@ -57,9 +59,15 @@ internal sealed class GeoMacroPanelViewModel : DockPane
         set
         {
             _isGenerating = value;
-            OnPropertyChanged();
+            NotifyPropertyChanged();
             CommandManager.InvalidateRequerySuggested();
         }
+    }
+
+    public string SourceFilter
+    {
+        get => _sourceFilter;
+        set { _sourceFilter = value; NotifyPropertyChanged(); ApplyFilter(); }
     }
 
     public int SelectedCount => Events.Count(e => e.IsSelected);
@@ -67,6 +75,9 @@ internal sealed class GeoMacroPanelViewModel : DockPane
     public ICommand RefreshHistoryCommand { get; }
     public ICommand SelectAllCommand { get; }
     public ICommand DeselectAllCommand { get; }
+    public ICommand FilterProCommand { get; }
+    public ICommand FilterDesktopCommand { get; }
+    public ICommand FilterAllCommand { get; }
     public ICommand GenerateScriptCommand { get; }
     public ICommand SaveScriptCommand { get; }
 
@@ -87,11 +98,12 @@ internal sealed class GeoMacroPanelViewModel : DockPane
         if (!Directory.Exists(mergedDir))
             mergedDir = @"D:\Work space\GEO\GeoMacro\runtime\merged";
 
-        Events.Clear();
+        _allEvents.Clear();
 
         if (!Directory.Exists(mergedDir))
         {
             StatusText = "No history found. Capture events first.";
+            ApplyFilter();
             return;
         }
 
@@ -104,7 +116,7 @@ internal sealed class GeoMacroPanelViewModel : DockPane
             try
             {
                 var json = File.ReadAllText(file, System.Text.Encoding.UTF8);
-                var arr = JsonSerializer.Deserialize<System.Text.Json.JsonElement[]>(json);
+                var arr = JsonSerializer.Deserialize<JsonElement[]>(json);
                 if (arr == null) continue;
 
                 foreach (var el in arr)
@@ -119,25 +131,46 @@ internal sealed class GeoMacroPanelViewModel : DockPane
                         Timestamp = el.TryGetProperty("timestamp", out var ts) ? ts.GetString() ?? "" : "",
                         IsSelected = true,
                     };
-                    Events.Add(item);
+                    _allEvents.Add(item);
                 }
             }
             catch
             {
-                // Skip unparseable files
             }
         }
 
-        StatusText = $"Loaded {Events.Count} events. {SelectedCount} selected.";
-        OnPropertyChanged(nameof(SelectedCount));
+        ApplyFilter();
+    }
+
+    private void SetSourceFilter(string filter)
+    {
+        SourceFilter = filter;
+    }
+
+    private void ApplyFilter()
+    {
+        Events.Clear();
+
+        var filtered = _sourceFilter switch
+        {
+            "arcgis_pro" => _allEvents.Where(e => e.Source == "arcgis_pro" || e.Source == ""),
+            "arcgis_desktop" => _allEvents.Where(e => e.Source == "arcgis_desktop"),
+            _ => _allEvents,
+        };
+
+        foreach (var item in filtered)
+            Events.Add(item);
+
+        NotifyPropertyChanged(nameof(SelectedCount));
+        StatusText = $"[{_sourceFilter}] {Events.Count} events, {SelectedCount} selected.";
     }
 
     private void SetAllSelected(bool selected)
     {
         foreach (var evt in Events)
             evt.IsSelected = selected;
-        OnPropertyChanged(nameof(SelectedCount));
-        StatusText = $"{Events.Count} events, {SelectedCount} selected.";
+        NotifyPropertyChanged(nameof(SelectedCount));
+        StatusText = $"[{_sourceFilter}] {Events.Count} events, {SelectedCount} selected.";
     }
 
     private async System.Threading.Tasks.Task GenerateScriptAsync()
