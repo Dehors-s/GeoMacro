@@ -1,0 +1,18 @@
++---------------------------------------+
+|    GeoMacro Script Validation Report  |
++---------------------------------------+
+  Status: [OK]  (0 errors, 8 warnings)
+
+  -- Details --
+  [WARN] [WARNING] Input variable input_path_1 does not exist: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_1_repairgeometry.shp
+  [INFO] [INFO] Output variable output_path_1 has parent directory that does not exist yet: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_1_repairgeometry.shp
+  [WARN] [WARNING] Input variable input_path_2 does not exist: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_2_repairgeometry.shp
+  [INFO] [INFO] Output variable output_path_2 has parent directory that does not exist yet: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_2_repairgeometry.shp
+  [WARN] [WARNING] Input variable input_path_3 does not exist: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_3_repairgeometry.shp
+  [INFO] [INFO] Output variable output_path_3 has parent directory that does not exist yet: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_3_repairgeometry.shp
+  [WARN] [WARNING] Input variable input_path_4 does not exist: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_4_repairgeometry.shp
+  [INFO] [INFO] Output variable output_path_4 has parent directory that does not exist yet: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_4_repairgeometry.shp
+  [WARN] [WARNING] Input path for '修复几何' does not exist on disk: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_1_repairgeometry.shp
+  [WARN] [WARNING] Input path for '修复几何' does not exist on disk: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_2_repairgeometry.shp
+  [WARN] [WARNING] Input path for '修复几何' does not exist on disk: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_3_repairgeometry.shp
+  [WARN] [WARNING] Input path for '修复几何' does not exist on disk: D:\Work space\DeepLearning\farm\results\he015009_vectorized\test\HE015009_2024_4_repairgeometry.shp

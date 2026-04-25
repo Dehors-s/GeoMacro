@@ -2,7 +2,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple
+
+
+class ProductSource(Enum):
+    DESKTOP = "arcgis_desktop"
+    PRO = "arcgis_pro"
+    UNKNOWN = "unknown"
 
 
 @dataclass(frozen=True)
@@ -24,6 +31,28 @@ class StandardEvent:
     outputs: List[str] = field(default_factory=list)
     messages: List[str] = field(default_factory=list)
     raw: Dict[str, Any] = field(default_factory=dict)
+    source: str = "unknown"
+
+
+def detect_product_source(
+    tool_path: str = "",
+    history_source: str = "",
+    tool_name: str = "",
+) -> str:
+    """
+    Detect the ArcGIS product source from tool path, history source, etc.
+    Returns one of "arcgis_desktop", "arcgis_pro", or "unknown".
+    """
+    clues = [tool_path.lower(), history_source.lower(), tool_name.lower()]
+    combined = " ".join(clues)
+
+    if "desktop10." in combined or "desktop\\10." in combined or "arcgis\\desktop" in combined:
+        return ProductSource.DESKTOP.value
+    if "arcgispro" in combined or "arcgis_pro" in combined or "\\pro\\" in combined:
+        return ProductSource.PRO.value
+    if "arctoolbox\\toolboxes" in combined.replace("/", "\\") and "arcgispro" not in combined:
+        return ProductSource.DESKTOP.value
+    return ProductSource.UNKNOWN.value
 
 
 @dataclass(frozen=True)

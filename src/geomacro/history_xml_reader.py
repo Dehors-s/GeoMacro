@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Sequence
 import xml.etree.ElementTree as ET
 
+from .models import detect_product_source
+
 
 _PATH_PARAM_TYPES = {
     "dataset",
@@ -19,6 +21,17 @@ _PATH_PARAM_TYPES = {
     "featureclass",
     "raster dataset",
     "table",
+}
+
+_NON_PATH_PARAM_TYPES = {
+    "scalar",
+    "string",
+    "boolean",
+    "long",
+    "double",
+    "field",
+    "sql expression",
+    "units",
 }
 
 
@@ -68,7 +81,7 @@ def load_history_items_from_xml(
     for xml_path in xml_files:
         try:
             items.extend(_parse_history_xml_file(xml_path))
-        except ET.ParseError:
+        except Exception:
             continue
 
     return items
@@ -100,8 +113,17 @@ def _collect_recent_xml_files(
 
 
 def _parse_history_xml_file(xml_path: Path) -> List[Dict[str, Any]]:
-    tree = ET.parse(xml_path)
-    root = tree.getroot()
+    raw = _recover_truncated_xml(xml_path)
+    if raw is None:
+        try:
+            raw = xml_path.read_bytes()
+        except OSError:
+            return []
+
+    try:
+        root = ET.fromstring(raw)
+    except ET.ParseError:
+        return []
 
     result_views = root.findall("./ResultView")
     items: List[Dict[str, Any]] = []
@@ -111,6 +133,29 @@ def _parse_history_xml_file(xml_path: Path) -> List[Dict[str, Any]]:
             items.append(item)
 
     return items
+
+
+def _recover_truncated_xml(xml_path: Path) -> Optional[bytes]:
+    """Recover truncated XML by appending missing close tags."""
+    try:
+        raw = xml_path.read_bytes()
+    except OSError:
+        return None
+    if not raw:
+        return None
+
+    text = raw.decode("utf-8", errors="replace")
+
+    import re as _re
+    open_rv = len(_re.findall(r"<ResultView[>\s]", text))
+    close_rv = text.count("</ResultView>")
+
+    for _ in range(open_rv - close_rv):
+        text += "\n</ResultView>\n"
+    if text.count("<ResultViews") > text.count("</ResultViews"):
+        text += "\n</ResultViews>\n"
+
+    return text.encode("utf-8")
 
 
 def _parse_result_view(result_view: ET.Element, xml_path: Path, index: int) -> Optional[Dict[str, Any]]:
@@ -152,6 +197,12 @@ def _parse_result_view(result_view: ET.Element, xml_path: Path, index: int) -> O
     if end_time_text:
         messages.append(end_time_text)
 
+    message_nodes = result_view.findall("./Messages/Message")
+    for msg_node in message_nodes:
+        msg_text = _node_text(msg_node)
+        if msg_text:
+            messages.append(msg_text)
+
     event_id = _build_history_event_id(xml_path, index, tool_path, timestamp, command_line)
 
     return {
@@ -159,11 +210,16 @@ def _parse_result_view(result_view: ET.Element, xml_path: Path, index: int) -> O
         "TimeStamp": timestamp,
         "ToolPath": tool_path,
         "ToolName": tool_name,
-        "Succeeded": _parse_success_from_end_text(end_time_text),
+        "Succeeded": _parse_success_from_end_text(end_time_text, messages),
         "Parameters": parameters,
         "Outputs": outputs,
         "Messages": messages,
         "HistorySource": str(xml_path),
+        "source": detect_product_source(
+            tool_path=tool_path,
+            history_source=str(xml_path),
+            tool_name=tool_name,
+        ),
     }
 
 
@@ -210,12 +266,14 @@ def _is_probable_path_param(value: str, param_type: str) -> bool:
     normalized_type = param_type.strip().lower()
     if normalized_type in _PATH_PARAM_TYPES:
         return True
+    if normalized_type in _NON_PATH_PARAM_TYPES:
+        return False
 
     text = value.strip()
     if not text:
         return False
 
-    if ":\\" in text or text.startswith("\\"):
+    if ":\\" in text or text.startswith("\\\\") or text.startswith("//"):
         return True
 
     lowered = text.lower()
@@ -237,6 +295,7 @@ def _parse_start_time(text: str) -> str:
         "%a %b %d %H:%M:%S %Y",
         "%Y-%m-%d %H:%M:%S",
         "%Y/%m/%d %H:%M:%S",
+        "%Y年%m月%d日 %H:%M:%S",
     ]
 
     for fmt in formats:
@@ -249,12 +308,20 @@ def _parse_start_time(text: str) -> str:
     return value
 
 
-def _parse_success_from_end_text(text: str) -> bool:
+def _parse_success_from_end_text(text: str, messages: Optional[List[str]] = None) -> bool:
     lowered = text.lower()
     if any(token in lowered for token in ("失败", "error", "failed", "错误")):
         return False
     if any(token in lowered for token in ("成功", "succeeded", "complete", "completed")):
         return True
+
+    if messages:
+        all_text = " ".join(msg.lower() for msg in messages)
+        if any(token in all_text for token in ("失败", "error", "failed", "错误")):
+            return False
+        if any(token in all_text for token in ("成功", "succeeded", "complete", "completed")):
+            return True
+
     return True
 
 

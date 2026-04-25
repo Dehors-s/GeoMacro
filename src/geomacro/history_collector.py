@@ -150,6 +150,8 @@ class HistoryCollector:
         if self._success_value_missing(live_event.raw):
             is_success = history_event.is_success
 
+        source = live_event.source or history_event.source
+
         ordered_params = list(live_event.ordered_params) or list(history_event.ordered_params)
         outputs = self._merge_unique_strings(list(live_event.outputs), list(history_event.outputs))
         messages = self._merge_unique_strings(list(live_event.messages), list(history_event.messages))
@@ -168,6 +170,7 @@ class HistoryCollector:
             outputs=outputs,
             messages=messages,
             raw=merged_raw,
+            source=source,
         )
 
     def _deduplicate(self, events: Sequence[StandardEvent]) -> List[StandardEvent]:

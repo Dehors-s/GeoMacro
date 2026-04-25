@@ -4,6 +4,8 @@ from datetime import datetime
 from typing import Any, Dict, Iterable, List, Sequence
 from uuid import uuid4
 
+from .models import detect_product_source
+
 
 class HistoryParser:
     """Parse ArcGIS history-like objects into raw event dictionaries."""
@@ -46,6 +48,7 @@ class HistoryParser:
             "outputs": outputs,
             "messages": messages,
             "is_success": is_success,
+            "source": self._pick_first(item, ["source", "Source", "product_source"], default="") or "",
             "raw": dict(item),
         }
 

@@ -4,7 +4,7 @@ import os
 from datetime import datetime
 from typing import Any, Dict, Iterable, List, Sequence
 
-from .models import Parameter, StandardEvent
+from .models import Parameter, StandardEvent, detect_product_source
 
 
 class EventNormalizer:
@@ -73,6 +73,18 @@ class EventNormalizer:
         )
         is_success = self._coerce_success(success_value)
 
+        source = str(
+            self._pick_first(raw_event, ["source", "Source", "product_source"], default="") or ""
+        )
+        if not source or source in {"", "unknown"}:
+            raw_inner = raw_event.get("raw") or raw_event
+            history_source = str(raw_inner.get("HistorySource", ""))
+            source = detect_product_source(
+                tool_path=tool_path,
+                history_source=history_source,
+                tool_name=tool_name,
+            )
+
         return StandardEvent(
             event_id=event_id,
             tool_name=tool_name,
@@ -83,16 +95,20 @@ class EventNormalizer:
             outputs=outputs,
             messages=messages,
             raw=dict(raw_event.get("raw") or raw_event),
+            source=source,
         )
 
     def _normalize_param(self, index: int, raw_param: Any) -> Parameter:
         if isinstance(raw_param, Parameter):
             return raw_param
 
+        explicit_is_path_provided = False
+
         if isinstance(raw_param, dict):
             name = str(raw_param.get("name") or f"param_{index}")
             value = raw_param.get("value")
             direction = str(raw_param.get("direction") or "input").lower()
+            explicit_is_path_provided = "is_path" in raw_param
             is_path = bool(raw_param.get("is_path", False))
         elif isinstance(raw_param, (list, tuple)) and len(raw_param) >= 2:
             name = str(raw_param[0] or f"param_{index}")
@@ -105,7 +121,7 @@ class EventNormalizer:
             direction = "input"
             is_path = False
 
-        if isinstance(value, str) and self._is_probable_path(value):
+        if isinstance(value, str) and not explicit_is_path_provided and self._is_probable_path(value):
             is_path = True
             value = self._normalize_path(value)
 
@@ -177,9 +193,11 @@ class EventNormalizer:
         text = value.strip()
         if not text:
             return False
-        if ":\\" in text or text.startswith("\\"):
-            return True
-        if "/" in text or "\\" in text:
+        if ":\\" in text or ":/" in text or text.startswith("\\\\") or text.startswith("//"):
             return True
         lowered = text.lower()
-        return lowered.endswith((".shp", ".gdb", ".tif", ".img", ".json", ".csv", ".txt"))
+        if lowered.endswith((".shp", ".gdb", ".tif", ".img", ".json", ".csv", ".txt")):
+            return True
+        if "\\" in text or "/" in text:
+            return True
+        return False

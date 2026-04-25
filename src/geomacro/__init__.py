@@ -1,4 +1,4 @@
-from .models import ExtractionResult, Parameter, StandardEvent, StepNode, VariableSlot
+from .models import ExtractionResult, Parameter, ProductSource, StandardEvent, StepNode, VariableSlot, detect_product_source
 from .history_collector import HistoryCollector
 from .history_parser import HistoryParser
 from .history_xml_reader import discover_history_directories, load_history_items_from_xml
@@ -14,9 +14,11 @@ from .session_store import SessionStore
 __all__ = [
     "ExtractionResult",
     "Parameter",
+    "ProductSource",
     "StandardEvent",
     "StepNode",
     "VariableSlot",
+    "detect_product_source",
     "HistoryCollector",
     "HistoryParser",
     "discover_history_directories",
