@@ -36,6 +36,7 @@ internal sealed class GeoMacroPanelViewModel : DockPane
         FilterDesktopCommand = new RelayCommand(() => SetSourceFilter("arcgis_desktop"));
         FilterAllCommand = new RelayCommand(() => SetSourceFilter("all"));
         GenerateScriptCommand = new RelayCommand(() => { _ = GenerateScriptAsync(); }, () => !IsGenerating);
+        RunScriptCommand = new RelayCommand(() => { _ = RunScriptAsync(); }, () => !IsGenerating);
         SaveScriptCommand = new RelayCommand(() => SaveScript(), () => !string.IsNullOrWhiteSpace(ScriptPreview));
     }
 
@@ -79,6 +80,7 @@ internal sealed class GeoMacroPanelViewModel : DockPane
     public ICommand FilterDesktopCommand { get; }
     public ICommand FilterAllCommand { get; }
     public ICommand GenerateScriptCommand { get; }
+    public ICommand RunScriptCommand { get; }
     public ICommand SaveScriptCommand { get; }
 
     public static void Show()
@@ -183,6 +185,7 @@ internal sealed class GeoMacroPanelViewModel : DockPane
         if (result.Success && result.ScriptPath != null)
         {
             ScriptPreview = File.ReadAllText(result.ScriptPath, System.Text.Encoding.UTF8);
+            _lastScriptPath = result.ScriptPath;
             StatusText = $"Generated: {result.ScriptPath}";
             if (!string.IsNullOrWhiteSpace(result.StdErr))
                 StatusText += $" (stderr: {result.StdErr.Length} chars)";
@@ -192,7 +195,60 @@ internal sealed class GeoMacroPanelViewModel : DockPane
             ScriptPreview = "// Generation failed.\n" +
                            $"// Exit code: {result.ExitCode}\n" +
                            $"// stderr:\n{result.StdErr}";
+            _lastScriptPath = null;
             StatusText = "Generation failed.";
+        }
+
+        IsGenerating = false;
+    }
+
+    private string? _lastScriptPath;
+
+    private async System.Threading.Tasks.Task RunScriptAsync()
+    {
+        if (string.IsNullOrWhiteSpace(_lastScriptPath) || !File.Exists(_lastScriptPath))
+        {
+            StatusText = "No generated script found. Click Generate first.";
+            return;
+        }
+
+        IsGenerating = true;
+        StatusText = "Running script...";
+
+        var psi = new System.Diagnostics.ProcessStartInfo
+        {
+            FileName = @"D:\Conda_Data\envs\geomacro_env\python.exe",
+            Arguments = $"\"{_lastScriptPath}\" --input \"{_runner.ProjectRoot}\" --output \"{_runner.ProjectRoot}\\output\\run\"",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true,
+            WorkingDirectory = Path.GetDirectoryName(_lastScriptPath),
+        };
+
+        psi.EnvironmentVariables["PYTHONPATH"] = Path.Combine(_runner.ProjectRoot, "src");
+
+        try
+        {
+            using var proc = new System.Diagnostics.Process { StartInfo = psi };
+            proc.Start();
+            var stdout = await proc.StandardOutput.ReadToEndAsync();
+            var stderr = await proc.StandardError.ReadToEndAsync();
+            await proc.WaitForExitAsync();
+
+            var output = $"Exit code: {proc.ExitCode}\n{stdout}";
+            if (!string.IsNullOrWhiteSpace(stderr))
+                output += $"\n--- stderr ---\n{stderr}";
+
+            ScriptPreview = output;
+            StatusText = proc.ExitCode == 0
+                ? $"Script executed successfully (exit 0). Saved to output/run/"
+                : $"Script failed (exit {proc.ExitCode}). See preview for details.";
+        }
+        catch (Exception ex)
+        {
+            ScriptPreview = $"Failed to launch script:\n{ex}";
+            StatusText = "Failed to launch script.";
         }
 
         IsGenerating = false;

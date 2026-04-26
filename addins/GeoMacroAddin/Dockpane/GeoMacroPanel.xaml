@@ -22,22 +22,17 @@
 
         <!-- Toolbar -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,4">
-            <Button Content="Refresh" Command="{Binding RefreshHistoryCommand}"
-                    Padding="8,2" Margin="0,0,4,0" />
-            <Button Content="All" Command="{Binding SelectAllCommand}"
-                    Padding="6,2" Margin="0,0,4,0" />
-            <Button Content="None" Command="{Binding DeselectAllCommand}"
-                    Padding="6,2" Margin="0,0,8,0" />
-            <Border Background="#CCC" Width="1" Height="18" Margin="0,0,4,0" />
-            <Button Content="Pro" Command="{Binding FilterProCommand}"
-                    Padding="6,2" Margin="0,0,4,0" />
-            <Button Content="D10.8" Command="{Binding FilterDesktopCommand}"
-                    Padding="6,2" Margin="0,0,4,0" />
-            <Button Content="All" Command="{Binding FilterAllCommand}"
-                    Padding="6,2" Margin="0,0,8,0" />
-            <Border Background="#CCC" Width="1" Height="18" Margin="0,0,4,0" />
-            <Button Content="Generate" Command="{Binding GenerateScriptCommand}"
-                    Padding="10,2" FontWeight="SemiBold" />
+            <Button Content="⟳" Command="{Binding RefreshHistoryCommand}" Width="26" Margin="0,0,2,0" />
+            <Button Content="All" Command="{Binding SelectAllCommand}" Width="30" Margin="0,0,2,0" />
+            <Button Content="No" Command="{Binding DeselectAllCommand}" Width="30" Margin="0,0,6,0" />
+            <Button Content="P" Command="{Binding FilterProCommand}" Width="22" Margin="0,0,2,0" />
+            <Button Content="D" Command="{Binding FilterDesktopCommand}" Width="22" Margin="0,0,2,0" />
+            <Button Content="*" Command="{Binding FilterAllCommand}" Width="22" Margin="0,0,6,0" />
+            <Button Content="Gen" Command="{Binding GenerateScriptCommand}" Width="36"
+                    FontWeight="SemiBold" Margin="0,0,2,0" />
+            <Button Content="Run" Command="{Binding RunScriptCommand}" Width="34"
+                    FontWeight="SemiBold" Margin="0,0,2,0" />
+            <Button Content="Save" Command="{Binding SaveScriptCommand}" Width="36" />
         </StackPanel>
 
         <!-- Event List -->
@@ -105,19 +100,10 @@
 
         <!-- Bottom Bar -->
         <Grid Grid.Row="5" Margin="0,4,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <TextBlock Grid.Column="0" Text="{Binding StatusText}"
+            <TextBlock Text="{Binding StatusText}"
                        FontSize="11" Foreground="DimGray"
                        VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis" />
-
-            <Button Grid.Column="1" Content="Save Script"
-                    Command="{Binding SaveScriptCommand}"
-                    Padding="10,3" Margin="4,0,0,0" />
         </Grid>
     </Grid>
 </UserControl>

@@ -17,6 +17,9 @@ internal sealed class PythonRunner
         _projectRoot = projectRoot;
     }
 
+    public string ProjectRoot => _projectRoot;
+    public string PythonPath => _pythonPath;
+
     public async Task<PythonResult> RunGeoMacroAsync(int lookbackHours = 24, bool includeFailed = false)
     {
         var sb = new StringBuilder();
