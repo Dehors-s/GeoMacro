@@ -1,0 +1,56 @@
+# ── Python ──
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+.pytest_cache/
+*.pytest_cache
+*.pyc
+
+# ── .NET / VS Build ──
+addins/*/bin/
+addins/*/obj/
+*.suo
+*.user
+*.vs/
+.vs/
+
+# ── IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ── Runtime / Generated ──
+runtime/events/
+runtime/merged/
+runtime/sessions/
+runtime/logs/
+output/
+reports/
+generated_script.py
+
+# ── Data / Scratch ──
+data/input/
+data/output/
+data/scratch/
+
+# ── ArcGIS Add-in Packages ──
+*.esriAddIn
+*.esriAddinX
+*.esriPlugin
+*.proConfigX
+
+# ── OS ──
+Thumbs.db
+.DS_Store
+
+# ── Debug / Probe tools (throw-away experiments) ──
+runtime/tools/*/bin/
+runtime/tools/*/obj/
+
+# ── Environment ──
+.env
+*.local
