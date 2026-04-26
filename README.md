@@ -75,7 +75,7 @@ GeoMacro 是一个 ArcGIS Pro 插件，它能**记住你刚刚做过的地理处
 
 ```powershell
 # 克隆仓库
-git clone https://github.com/your-org/GeoMacro.git
+git clone https://github.com/Dehors-s/GeoMacro
 cd GeoMacro
 
 # 创建 Python 环境
